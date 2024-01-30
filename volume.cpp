@@ -33,6 +33,7 @@ Volume::Volume(const char* str)
 QString Volume::toStr() const
 {
   QString str = QString::number(volume);
+  if (str.indexOf('.') == -1) str.append(".0");
   return str;
 }
 
