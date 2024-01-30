@@ -13,6 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
   ui->menu->addAction(exportData);
   connect(importData, &QAction::triggered, this, &MainWindow::importData);
   connect(exportData, &QAction::triggered, this, &MainWindow::exportData);
+
+  Volume vol = 4.0f;
+  qDebug() << vol.toStr();
 }
 
 MainWindow::~MainWindow()
