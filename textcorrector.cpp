@@ -13,7 +13,7 @@ QString TextCorrector::noDuplicateSym(const QString &str)
   QString edit = "";
   QChar lastChar = -1;
   for (int i = 0; i < str.size(); i++) {
-    if (str[i] != lastChar || str[i].isDigit()) edit.push_back(str[i]);
+    if (str[i] != lastChar || str[i].isDigit()) edit.append(str[i]);
     lastChar = str[i];
   }
   return edit;
