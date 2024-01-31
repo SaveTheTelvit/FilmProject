@@ -6,16 +6,13 @@ MainWindow::MainWindow(QWidget *parent)
   , ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
-  this->setWindowTitle("Ухади");
+  this->setWindowTitle("");
   QAction *importData = new QAction("Импорировать данные", this);
   QAction *exportData = new QAction("Экспортитровать данные", this);
   ui->menu->addAction(importData);
   ui->menu->addAction(exportData);
   connect(importData, &QAction::triggered, this, &MainWindow::importData);
   connect(exportData, &QAction::triggered, this, &MainWindow::exportData);
-
-  Volume vol = 4.0f;
-  qDebug() << vol.toStr();
 }
 
 MainWindow::~MainWindow()
@@ -25,10 +22,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::importData()
 {
-  qDebug() << "it's import";
+  qDebug() << "import";
 }
 
 void MainWindow::exportData()
 {
-  qDebug() << "it's export";
+  qDebug() << "export";
 }
