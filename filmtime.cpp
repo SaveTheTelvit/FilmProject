@@ -61,10 +61,10 @@ void FTime::toTime(QString str)
   QVector<int> vec;
   int pos = 0, qPos = 0;
   while((pos = str.indexOf(':', qPos)) != -1) {
-    vec.push_back(str.midRef(qPos, pos - qPos).toInt());
+    vec.push_back(str.mid(qPos, pos - qPos).toInt());
     qPos = pos + 1;
   }
-  if (qPos < str.size()) vec.push_back(str.midRef(qPos).toInt());
+  if (qPos < str.size()) vec.push_back(str.mid(qPos).toInt());
   QVector<int>::iterator it = vec.begin();
   switch (vec.size()) {
     default:

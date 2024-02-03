@@ -11,7 +11,7 @@ QString TextCorrector::noFirstLastSym(const QString &str)
 QString TextCorrector::noDuplicateSym(const QString &str)
 {
   QString edit = "";
-  QChar lastChar = -1;
+  QChar lastChar(0);
   for (int i = 0; i < str.size(); i++) {
     if (str[i] != lastChar || str[i].isDigit()) edit.append(str[i]);
     lastChar = str[i];
