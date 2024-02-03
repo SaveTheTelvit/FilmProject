@@ -11,8 +11,7 @@ public:
   Volume();
   Volume(float vol);
   Volume(int vol);
-  Volume(const QString& str);
-  Volume(const char* str);
+  Volume(const QString str);
   QString toStr() const;
 private:
   void toVolume(QString str);

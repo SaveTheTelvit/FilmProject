@@ -18,13 +18,7 @@ Volume::Volume(int vol)
   validate();
 }
 
-Volume::Volume(const QString& str)
-{
-  toVolume(str);
-  validate();
-}
-
-Volume::Volume(const char* str)
+Volume::Volume(const QString str)
 {
   toVolume(str);
   validate();
