@@ -29,7 +29,7 @@ bool DataBase::createFilmsTable()
                     "id INTEGER,"
                     "name TEXT NOT NULL,"
                     "format INTEGER,"
-                    "duration INTEGER"
+                    "duration INTEGER,"
                     "titleTime INTEGER,"
                     "volume INTEGER,"
                     "PRIMARY KEY (id AUTOINCREMENT)"
@@ -94,4 +94,16 @@ bool DataBase::createPlaylistTlrFilmTable()
                         ")");
         return !query.exec();
     } else return 1;
+}
+
+void DataBase::insertIntoFilms(const QVariantList &data)
+{
+    QSqlQuery query;
+    query.prepare("INSERT INTO FILMS VALUES (NULL, :name, :format, :duraton, :titlTime, :volume)");
+    query.bindValue(":name", data[0].toString());
+    query.bindValue(":format", data[1].toInt());
+    query.bindValue(":duration", data[2].toInt());
+    query.bindValue(":titleTime", data[3].toInt());
+    query.bindValue(":volume", data[4].toInt());
+    query.exec();
 }

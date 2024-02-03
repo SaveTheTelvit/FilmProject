@@ -10,6 +10,13 @@ MainWindow::MainWindow(QWidget *parent)
   db = new DataBase;
   db->openDataBase();
   db->createTables();
+  QVariantList data;
+  data.append("Холоп 2");
+  data.append(1);
+  data.append(2);
+  data.append(3);
+  data.append(4);
+  db->insertIntoFilms(data);
   QAction *importData = new QAction("Импорировать данные", this);
   QAction *exportData = new QAction("Экспортитровать данные", this);
   ui->menu->addAction(importData);

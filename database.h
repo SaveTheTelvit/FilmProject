@@ -12,8 +12,8 @@ class DataBase
 public:
   void openDataBase();
   void createTables();
-//  void insertIntoFilmsTable(const QVariantList &data);
-//  void insertIntoTlrsTable(const QVariantList &data);
+  void insertIntoFilms(const QVariantList &data);
+//  void insertIntoTlrs(const QVariantList &data);
 private:
   bool createFilmsTable();
   bool createTlrsTable();
