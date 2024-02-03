@@ -7,6 +7,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
   ui->setupUi(this);
   this->setWindowTitle("");
+  db = new DataBase;
+  db->openDataBase();
+  db->createTables();
   QAction *importData = new QAction("Импорировать данные", this);
   QAction *exportData = new QAction("Экспортитровать данные", this);
   ui->menu->addAction(importData);
