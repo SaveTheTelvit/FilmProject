@@ -23,6 +23,13 @@ struct FilmInfo {
   QVector<TlrInfo> tlrs;
 };
 
+struct PlaylistInfo {
+    QString name;
+    FilmInfo film;
+    unsigned short filmPos;
+    QVector<TlrInfo> tlrs;
+};
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
