@@ -8,15 +8,15 @@
 class Volume
 {
 public:
-  Volume();
-  Volume(float vol);
-  Volume(int vol);
-  Volume(const QString str);
-  QString toStr() const;
+    Volume();
+    Volume(float vol);
+    Volume(int vol);
+    Volume(const QString str);
+    QString toStr() const;
 private:
-  void toVolume(QString str);
-  void validate();
-  float volume = 0.0f;
+    void toVolume(QString str);
+    void validate();
+    float volume = 0.0f;
 };
 
 #endif // VOLUME_H

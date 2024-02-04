@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     database.cpp \
+    import.cpp \
     main.cpp \
     mainwindow.cpp \
     filmtime.cpp \
@@ -18,12 +19,15 @@ SOURCES += \
 
 HEADERS += \
     database.h \
+    import.h \
     mainwindow.h \
     filmtime.h \
+    structs.h \
     textcorrector.h \
     volume.h
 
 FORMS += \
+    import.ui \
     mainwindow.ui
 
 # Default rules for deployment.

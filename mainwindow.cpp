@@ -5,37 +5,36 @@ MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
 {
-  ui->setupUi(this);
-  this->setWindowTitle("");
-  db = new DataBase;
-  db->openDataBase();
-  db->createTables();
-  QVariantList data;
-  data.append("Холоп 2");
-  data.append(1);
-  data.append(2);
-  data.append(3);
-  data.append(4);
-  db->insertIntoFilms(data);
-  QAction *importData = new QAction("Импорировать данные", this);
-  QAction *exportData = new QAction("Экспортитровать данные", this);
-  ui->menu->addAction(importData);
-  ui->menu->addAction(exportData);
-  connect(importData, &QAction::triggered, this, &MainWindow::importData);
-  connect(exportData, &QAction::triggered, this, &MainWindow::exportData);
+    ui->setupUi(this);
+    db = new DataBase;
+    db->openDataBase();
+    setupMenu();
+    import = new Import(this);
+    ui->stackedWidget->addWidget(import);
 }
 
 MainWindow::~MainWindow()
 {
-  delete ui;
+    delete ui;
+}
+
+void MainWindow::setupMenu()
+{
+    QAction *importData = new QAction("Импорировать данные", this);
+    QAction *exportData = new QAction("Экспортитровать данные", this);
+    ui->menu->addAction(importData);
+    ui->menu->addAction(exportData);
+    connect(importData, &QAction::triggered, this, &MainWindow::importData);
+    connect(exportData, &QAction::triggered, this, &MainWindow::exportData);
 }
 
 void MainWindow::importData()
 {
-  qDebug() << "import";
+    import->findImportFile();
+    ui->stackedWidget->setCurrentWidget(import);
 }
 
 void MainWindow::exportData()
 {
-  qDebug() << "export";
+    qDebug() << "export";
 }

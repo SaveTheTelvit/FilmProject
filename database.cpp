@@ -2,14 +2,14 @@
 
 void DataBase::openDataBase()
 {
-  db = QSqlDatabase::addDatabase("QSQLITE");
-  db.setDatabaseName("TestData.db");
-  if (!db.open()) {
-      qDebug() << "No opened.";
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("TestData.db");
+    if (!db.open()) {
+        qDebug() << "No opened.";
   } else {
-      qDebug() << "Open!";
-      QSqlQuery query("PRAGMA foreign_keys = ON");
-      query.exec();
+        qDebug() << "Open!";
+        QSqlQuery("PRAGMA foreign_keys = ON").exec();
+        if (!db.tables(QSql::AllTables).contains("FILMS")) createTables();
   }
 }
 
@@ -72,8 +72,8 @@ bool DataBase::createFilmTlrTable()
                         "video_pos INTEGER,"
                         "tlr_id INTEGER,"
                         "PRIMARY KEY (film_id, video_pos),"
-                        "FOREIGN KEY (film_id) REFERENCES FILMS(id),"
-                        "FOREIGN KEY (tlr_id) REFERENCES TLRS(id)"
+                        "FOREIGN KEY (film_id) REFERENCES FILMS(id) ON UPDATE CASCADE ON DELETE CASCADE,"
+                        "FOREIGN KEY (tlr_id) REFERENCES TLRS(id) ON UPDATE CASCADE ON DELETE CASCADE"
                         ")");
         return !query.exec();
     } else return 1;
@@ -88,22 +88,38 @@ bool DataBase::createPlaylistTlrFilmTable()
                         "film_id INTEGER,"
                         "tlr_id INTEGER,"
                         "PRIMARY KEY (playlist_id, video_pos),"
-                        "FOREIGN KEY (playlist_id) REFERENCES PLAYLISTS(id),"
-                        "FOREIGN KEY (film_id) REFERENCES FILMS(id),"
-                        "FOREIGN KEY (tlr_id) REFERENCES TLRS(id)"
+                        "FOREIGN KEY (playlist_id) REFERENCES PLAYLISTS(id) ON UPDATE CASCADE ON DELETE CASCADE,"
+                        "FOREIGN KEY (film_id) REFERENCES FILMS(id) ON UPDATE CASCADE ON DELETE CASCADE,"
+                        "FOREIGN KEY (tlr_id) REFERENCES TLRS(id) ON UPDATE CASCADE ON DELETE CASCADE"
                         ")");
         return !query.exec();
     } else return 1;
 }
 
-void DataBase::insertIntoFilms(const QVariantList &data)
+void DataBase::insertIntoFilms(const QVariantList& data)
 {
     QSqlQuery query;
-    query.prepare("INSERT INTO FILMS VALUES (NULL, :name, :format, :duraton, :titlTime, :volume)");
+    query.prepare("INSERT INTO FILMS VALUES (NULL, :name, :format, :duration, :titleTime, :volume)");
     query.bindValue(":name", data[0].toString());
     query.bindValue(":format", data[1].toInt());
     query.bindValue(":duration", data[2].toInt());
     query.bindValue(":titleTime", data[3].toInt());
     query.bindValue(":volume", data[4].toInt());
+    query.exec();
+}
+
+void DataBase::insertIntoTlrs(const QVariantList& data)
+{
+    QSqlQuery query;
+    query.prepare("INSERT INTO TLRS VALUES (NULL, :name, :duration, :volume)");
+    query.bindValue(":name", data[0].toString());
+    query.bindValue(":duration", data[1].toInt());
+    query.bindValue(":volume", data[2].toInt());
+    query.exec();
+}
+
+void DataBase::insertIntoPlaylists(const QString& name)
+{
+    QSqlQuery query("INSERT INTO TLRS VALUES (NULL, " + name + ")");
     query.exec();
 }
