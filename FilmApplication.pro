@@ -14,6 +14,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     filmtime.cpp \
+    playlistview.cpp \
     textcorrector.cpp \
     volume.cpp
 
@@ -22,13 +23,15 @@ HEADERS += \
     import.h \
     mainwindow.h \
     filmtime.h \
+    playlistview.h \
     structs.h \
     textcorrector.h \
     volume.h
 
 FORMS += \
     import.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    playlistview.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

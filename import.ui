@@ -16,7 +16,7 @@
   <widget class="QListWidget" name="listWidget">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>490</x>
      <y>20</y>
      <width>256</width>
      <height>192</height>
@@ -26,8 +26,8 @@
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>290</y>
+     <x>490</x>
+     <y>220</y>
      <width>90</width>
      <height>28</height>
     </rect>

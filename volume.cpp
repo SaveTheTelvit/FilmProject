@@ -21,6 +21,7 @@ Volume::Volume(int vol)
 Volume::Volume(const QString str)
 {
     toVolume(str);
+    if (str.indexOf('.') == -1) volume /= 10;
     validate();
 }
 

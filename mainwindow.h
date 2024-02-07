@@ -7,7 +7,7 @@
 
 #include "database.h"
 #include "import.h"
-#include "structs.h"
+#include "playlistview.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,6 +26,7 @@ private:
     void exportData();
     void setupMenu();
     Import *import;
+    PlaylistView *pll;
     Ui::MainWindow *ui;
     DataBase *db;
 };

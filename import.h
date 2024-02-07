@@ -22,11 +22,16 @@ public:
 
 private slots:
     void on_pushButton_clicked();
+    void currentIndexChanged();
 
 private:
     void readImportFile(const QString& fileName);
+    PlaylistInfo readPlaylistInfo(QXmlStreamReader& xml);
+    FilmInfo readFilmInfo(QXmlStreamReader& xml);
+    TlrInfo readTlrInfo(QXmlStreamReader& xml);
     Ui::Import *ui;
     QString importFile;
+    QVector<PlaylistInfo> playlists;
 };
 
 #endif // IMPORT_H

@@ -9,7 +9,9 @@ MainWindow::MainWindow(QWidget *parent)
     db = new DataBase;
     db->openDataBase();
     setupMenu();
+    pll = new PlaylistView(this);
     import = new Import(this);
+    ui->stackedWidget->addWidget(pll);
     ui->stackedWidget->addWidget(import);
 }
 

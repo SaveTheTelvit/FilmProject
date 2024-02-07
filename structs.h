@@ -13,6 +13,8 @@ struct TlrInfo {
 };
 
 struct FilmInfo {
+    unsigned short pos;
+    unsigned short format;
     QString name;
     FTime duration;
     FTime titleTime;
@@ -22,8 +24,7 @@ struct FilmInfo {
 
 struct PlaylistInfo {
     QString name;
-    FilmInfo film;
-    unsigned short filmPos;
+    QVector<FilmInfo> films;
     QVector<TlrInfo> tlrs;
 };
 
