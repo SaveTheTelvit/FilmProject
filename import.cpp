@@ -94,26 +94,13 @@ PlaylistInfo Import::readPlaylistInfo(QXmlStreamReader &xml)
                     if (name == "Name") {
                         pll.name = xml.readElementText();
                     } else if (name == "FilmInfo") {
-                        FilmInfo f = readFilmInfo(xml);
-                        if (pll.films.size() != 0) {
-                            for (int i = pll.films.size() - 1, lastPos = -1; i > -1; --i) {
-                                if (i == 0) {
-                                    if (f.pos < pll.films[0].pos) {
-                                        pll.films.push_front(f);
-                                    } else pll.films.insert(1, f);
-                                } else {
-                                    if (lastPos <= f.pos) pll.films.insert(lastPos + 1, f);
-                                    lastPos = pll.films[i].pos;
-                                }
-                            }
-                        } else pll.films.push_back(f);
+                        pll.films.push_back(readFilmInfo(xml));
+                        pll.tlrs.push_back(TlrInfo());
+                        pll.films.last().pos = pll.tlrs.size() - 1;
                     } else if (name == "TlrInfo") {
                         pll.tlrs.push_back(readTlrInfo(xml));
                     }
             } else if (token == QXmlStreamReader::EndElement && xml.name().toString() == "Playlist") {
-                for (int i = 0; i < pll.films.size(); ++i) {
-                    pll.tlrs.insert(pll.films[i].pos, TlrInfo());
-                }
                 return pll;
             }
         }
@@ -123,13 +110,6 @@ PlaylistInfo Import::readPlaylistInfo(QXmlStreamReader &xml)
 FilmInfo Import::readFilmInfo(QXmlStreamReader &xml)
 {
     FilmInfo film;
-    film.pos = -1;
-    for (int i = 0; i < xml.attributes().size(); ++i) {
-        if (xml.attributes()[i].name().toString() == "pos") {
-            film.pos = xml.attributes()[i].value().toInt();
-            break;
-        }
-    }
     while (!xml.atEnd() && !xml.hasError()) {
         QXmlStreamReader::TokenType token = xml.readNext();
         if (token == QXmlStreamReader::StartElement) {
