@@ -9,6 +9,7 @@ public:
     Format();
     Format(int num);
     QString toStr() const;
+    int toInt() const;
 private:
     int format = 99;
 };

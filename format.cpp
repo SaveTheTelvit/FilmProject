@@ -21,3 +21,8 @@ QString Format::toStr() const
         default: return "invalid format";
     }
 }
+
+int Format::toInt() const
+{
+    return format;
+}

@@ -17,7 +17,7 @@ public:
     void insertIntoFilms(const QVariantList& data);
     void insertIntoTlrs(const QVariantList& data);
     void insertIntoPlaylists(const QString& name);
-    void importPlaylistData(const PlaylistInfo& playlist);
+    void importPlaylistData(const QVariantList& data);
 
 private:
     bool createFilmsTable();

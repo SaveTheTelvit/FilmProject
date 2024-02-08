@@ -124,7 +124,7 @@ void DataBase::insertIntoPlaylists(const QString& name)
     query.exec();
 }
 
-void DataBase::importPlaylistData(const PlaylistInfo &playlist)
+void DataBase::importPlaylistData(const QVariantList& data)
 {
-    //for (int i = 0; i < playlists.tlrs.size())
+
 }
