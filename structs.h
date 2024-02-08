@@ -4,6 +4,7 @@
 #include <QString>
 
 #include "filmtime.h"
+#include "format.h"
 #include "volume.h"
 
 struct TlrInfo {
@@ -13,8 +14,8 @@ struct TlrInfo {
 };
 
 struct FilmInfo {
-    unsigned short pos;
-    unsigned short format;
+    int pos;
+    Format format;
     QString name;
     FTime duration;
     FTime titleTime;

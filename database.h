@@ -7,6 +7,8 @@
 #include <QSqlQuery>
 #include <QString>
 
+#include "structs.h"
+
 class DataBase
 {
 public:
@@ -15,6 +17,7 @@ public:
     void insertIntoFilms(const QVariantList& data);
     void insertIntoTlrs(const QVariantList& data);
     void insertIntoPlaylists(const QString& name);
+    void importPlaylistData(const PlaylistInfo& playlist);
 
 private:
     bool createFilmsTable();

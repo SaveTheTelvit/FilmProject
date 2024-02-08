@@ -6,8 +6,10 @@ Import::Import(QWidget *parent) :
     ui(new Ui::Import)
 {
     ui->setupUi(this);
+    connect(ui->listWidget, &QListWidget::currentItemChanged, this, &Import::currentIndexChanged);
+    connect(ui->listWidget, &QListWidget::itemActivated, this, [](QListWidgetItem* item)
+    {if (item->checkState() == Qt::Unchecked) {item->setCheckState(Qt::Checked);} else item->setCheckState(Qt::Unchecked);});
 }
-
 Import::~Import()
 {
     delete ui;
@@ -15,13 +17,16 @@ Import::~Import()
 
 void Import::findImportFile()
 {
-    readImportFile(QFileDialog::getOpenFileName(this, tr("Импорт данных"), "/home" ,tr("pl, *.pl")));
-    qDebug() << "Я тута";
-    for (int i = 0; i < playlists.size(); ++i) {
-      QListWidgetItem *item = new QListWidgetItem(playlists[i].name, ui->listWidget);
-      item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-      item->setCheckState(Qt::Unchecked);
-      connect(ui->listWidget, &QListWidget::currentItemChanged, this, &Import::currentIndexChanged);
+    playlists.clear();
+    ui->listWidget->clear();
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Импорт данных"), "/home" ,tr("tpls(*.tpls)"));
+    if (filePath != "") {
+        readImportFile(filePath);
+        for (int i = 0; i < playlists.size(); ++i) {
+            QListWidgetItem *item = new QListWidgetItem(playlists[i].name, ui->listWidget);
+            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+            item->setCheckState(Qt::Unchecked);
+        }
     }
 }
 
@@ -37,19 +42,29 @@ void Import::on_pushButton_clicked()
 
 void Import::currentIndexChanged()
 {
-  int index = ui->listWidget->currentRow();
-    PlaylistInfo playlist = playlists[index];
-    for (int i = 0; i < playlist.films.size(); ++i) {
-      playlist.tlrs.insert(playlist.films[i].pos, TlrInfo());
-    }
-    for (int i = 0, j = 0; i < playlist.tlrs.size(); i++) {
-      QVector<QString> strings;
-      if (playlist.films[j].pos == i) {
-        FilmInfo& film = playlist.films[j];
-        strings << ("Name: " + film.name) << ("Format: " + QString::number(film.format));
-      } else {
-
-      }
+    int index = ui->listWidget->currentRow();
+    if (index >= 0 && index < playlists.size()) {
+        PlaylistInfo playlist = playlists[index];
+        QVector<QString> strings;
+        for (int i = 0, n = 0; i < playlist.tlrs.size(); i++) {
+            if (n < playlist.films.size() && playlist.films[n].pos == i) {
+                FilmInfo& film = playlist.films[n];
+                strings << ("Name: " + film.name) << ("Format: " + film.format.toStr()) << ("Duration: " + film.duration.toStr())
+                                                  << ("TitleTime: " + film.titleTime.toStr()) << ("Volume: " + film.volume.toStr());
+                ++n;
+                for (int j = 0; j < film.tlrs.size(); ++j) {
+                    strings << ("Tlr " + QString::number(j + 1) + ":");
+                    strings << ("Name: " + film.tlrs[j].name) << ("Duration: " + film.tlrs[j].duration.toStr())
+                            << ("Volume: " + film.tlrs[j].volume.toStr());
+                }
+            } else {
+                strings << ("Name: " + playlist.tlrs[i].name) << ("Duration: " + playlist.tlrs[i].duration.toStr())
+                        << ("Volume: " + playlist.tlrs[i].volume.toStr());
+            }
+        }
+        for (int i = 0; i < strings.size(); ++i) {
+            qDebug() << strings[i];
+        }
     }
 }
 
@@ -60,7 +75,6 @@ void Import::readImportFile(const QString& fileName)
     file->open(QIODevice::ReadOnly);
     QXmlStreamReader xml(file);
     while (!xml.atEnd() && !xml.hasError()) {
-        qDebug() << xml.name();
         QXmlStreamReader::TokenType token = xml.readNext();
         if (token == QXmlStreamReader::StartElement) {
           if (xml.name().toString() == "Playlist") {
@@ -72,70 +86,91 @@ void Import::readImportFile(const QString& fileName)
 
 PlaylistInfo Import::readPlaylistInfo(QXmlStreamReader &xml)
 {
-  PlaylistInfo pll;
-      while (!xml.atEnd() && !xml.hasError()) {
-        QXmlStreamReader::TokenType token = xml.readNext();
-        if (token == QXmlStreamReader::StartElement) {
-          QString name = xml.name().toString();
-          if (name == "Name") {
-            pll.name = xml.readElementText();
-          } else if (name == "FilmInfo") {
-            pll.films.push_back(readFilmInfo(xml));
-          } else if (name == "TlrInfo") {
-            pll.tlrs.push_back(readTlrInfo(xml));
-          }
-        } else if (token == QXmlStreamReader::EndElement && xml.name().toString() == "Playlist") {
-          return pll;
-      }
-  }
-  return pll;
+    PlaylistInfo pll;
+        while (!xml.atEnd() && !xml.hasError()) {
+            QXmlStreamReader::TokenType token = xml.readNext();
+            if (token == QXmlStreamReader::StartElement) {
+                QString name = xml.name().toString();
+                    if (name == "Name") {
+                        pll.name = xml.readElementText();
+                    } else if (name == "FilmInfo") {
+                        FilmInfo f = readFilmInfo(xml);
+                        if (pll.films.size() != 0) {
+                            for (int i = pll.films.size() - 1, lastPos = -1; i > -1; --i) {
+                                if (i == 0) {
+                                    if (f.pos < pll.films[0].pos) {
+                                        pll.films.push_front(f);
+                                    } else pll.films.insert(1, f);
+                                } else {
+                                    if (lastPos <= f.pos) pll.films.insert(lastPos + 1, f);
+                                    lastPos = pll.films[i].pos;
+                                }
+                            }
+                        } else pll.films.push_back(f);
+                    } else if (name == "TlrInfo") {
+                        pll.tlrs.push_back(readTlrInfo(xml));
+                    }
+            } else if (token == QXmlStreamReader::EndElement && xml.name().toString() == "Playlist") {
+                for (int i = 0; i < pll.films.size(); ++i) {
+                    pll.tlrs.insert(pll.films[i].pos, TlrInfo());
+                }
+                return pll;
+            }
+        }
+    return pll;
 }
 
 FilmInfo Import::readFilmInfo(QXmlStreamReader &xml)
 {
-  FilmInfo film;
-  film.pos = xml.attributes()[0].value().toInt();
-  while (!xml.atEnd() && !xml.hasError()) {
-    QXmlStreamReader::TokenType token = xml.readNext();
-      if (token == QXmlStreamReader::StartElement) {
-        QString name = xml.name().toString();
-        if (name == "Name") {
-          film.name = xml.readElementText();
-        } else if (name == "Format") {
-          film.format = xml.readElementText().toInt();
-        } else if (name == "Duration") {
-          film.duration = FTime(xml.readElementText());
-        } else if (name == "TitleTime") {
-          film.titleTime = FTime(xml.readElementText());
-        } else if (name == "Volume") {
-          film.volume = Volume(xml.readElementText());
-        } else if (name == "TlrInfo") {
-          film.tlrs.push_back(readTlrInfo(xml));
+    FilmInfo film;
+    film.pos = -1;
+    for (int i = 0; i < xml.attributes().size(); ++i) {
+        if (xml.attributes()[i].name().toString() == "pos") {
+            film.pos = xml.attributes()[i].value().toInt();
+            break;
         }
-      } else if (token == QXmlStreamReader::EndElement && xml.name().toString() == "FilmInfo") {
-        return film;
-      }
-  }
-  return film;
+    }
+    while (!xml.atEnd() && !xml.hasError()) {
+        QXmlStreamReader::TokenType token = xml.readNext();
+        if (token == QXmlStreamReader::StartElement) {
+            QString name = xml.name().toString();
+            if (name == "Name") {
+                film.name = xml.readElementText();
+            } else if (name == "Format") {
+                film.format = xml.readElementText().toInt();
+            } else if (name == "Duration") {
+                film.duration = FTime(xml.readElementText());
+            } else if (name == "TitleTime") {
+                film.titleTime = FTime(xml.readElementText());
+            } else if (name == "Volume") {
+                film.volume = Volume(xml.readElementText());
+            } else if (name == "TlrInfo") {
+                film.tlrs.push_back(readTlrInfo(xml));
+            }
+        } else if (token == QXmlStreamReader::EndElement && xml.name().toString() == "FilmInfo") {
+            return film;
+        }
+    }
+    return film;
 }
 
 TlrInfo Import::readTlrInfo(QXmlStreamReader &xml)
 {
-  TlrInfo tlr;
-  while (!xml.atEnd() && !xml.hasError()) {
-    QXmlStreamReader::TokenType token = xml.readNext();
-      if (token == QXmlStreamReader::StartElement) {
-        QString name = xml.name().toString();
-        if (name == "Name") {
-          tlr.name = xml.readElementText();
-        } else if (name == "Duration") {
-          tlr.duration = FTime(xml.readElementText());
-        } if (name == "Volume") {
-          tlr.volume = Volume(xml.readElementText());
+    TlrInfo tlr;
+    while (!xml.atEnd() && !xml.hasError()) {
+        QXmlStreamReader::TokenType token = xml.readNext();
+        if (token == QXmlStreamReader::StartElement) {
+            QString name = xml.name().toString();
+            if (name == "Name") {
+                tlr.name = xml.readElementText();
+            } else if (name == "Duration") {
+                tlr.duration = FTime(xml.readElementText());
+            } if (name == "Volume") {
+                tlr.volume = Volume(xml.readElementText());
+            }
+        } else if (token == QXmlStreamReader::EndElement && xml.name().toString() == "TlrInfo") {
+            return tlr;
         }
-      } else if (token == QXmlStreamReader::EndElement && xml.name().toString() == "TlrInfo") {
-        return tlr;
-      }
-  }
-  return tlr;
+    }
+    return tlr;
 }

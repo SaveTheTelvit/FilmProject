@@ -3,8 +3,10 @@
 QString TextCorrector::noFirstLastSym(const QString &str)
 {
     QString edit = str;
-    if (!str[str.size() - 1].isDigit()) edit = edit.remove(str.size() - 1, 1);
-    if (!str[0].isDigit()) edit = edit.remove(0,1);
+    if (str.size() != 0) {
+        if (!str[str.size() - 1].isDigit()) edit = edit.remove(str.size() - 1, 1);
+        if (!str[0].isDigit()) edit = edit.remove(0,1);
+    }
     return edit;
 }
 

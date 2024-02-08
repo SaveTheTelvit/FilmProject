@@ -123,3 +123,8 @@ void DataBase::insertIntoPlaylists(const QString& name)
     QSqlQuery query("INSERT INTO TLRS VALUES (NULL, " + name + ")");
     query.exec();
 }
+
+void DataBase::importPlaylistData(const PlaylistInfo &playlist)
+{
+    //for (int i = 0; i < playlists.tlrs.size())
+}

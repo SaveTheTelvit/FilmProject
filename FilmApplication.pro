@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     database.cpp \
+    format.cpp \
     import.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 
 HEADERS += \
     database.h \
+    format.h \
     import.h \
     mainwindow.h \
     filmtime.h \
