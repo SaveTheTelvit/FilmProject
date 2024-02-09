@@ -32,6 +32,11 @@ QString Volume::toStr() const
     return str;
 }
 
+int Volume::toInt() const
+{
+    return static_cast<int>(volume * 10);
+}
+
 void Volume::toVolume(QString str)
 {
     volume = TextCorrector::maxSimplefied(str, ".").toFloat();

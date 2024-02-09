@@ -14,10 +14,13 @@ class DataBase
 public:
     void openDataBase();
     void createTables();
-    void insertIntoFilms(const QVariantList& data);
-    void insertIntoTlrs(const QVariantList& data);
-    void insertIntoPlaylists(const QString& name);
-    void importPlaylistData(const QVariantList& data);
+    int insertIntoFilms(const QVariantList& data);
+    int insertIntoTlrs(const QVariantList& data);
+    int insertIntoPlaylists(const QString& name);
+    void insertIntoPlaylistFilm(const QVariantList& data);
+    void insertIntoPlaylistTlr(const QVariantList& data);
+    void insertIntoFilmTlr(const QVariantList& data);
+    void importPlaylistData(const PlaylistInfo& playlist);
 
 private:
     bool createFilmsTable();

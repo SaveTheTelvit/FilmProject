@@ -10,10 +10,6 @@ PlaylistView::PlaylistView(QWidget *parent) :
   query.exec();
   int i = 0;
   while (query.next()) {
-
-      //    QListWidgetItem *item = new QListWidgetItem("Элемент с чекбоксом", ui->listWidget);
-      //    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-      //    item->setCheckState(Qt::Unchecked);
     playlistIndex.insert(i,query.value(0).toInt());
     new QListWidgetItem(query.value(1).toString(), ui->Playlists);
     ++i;

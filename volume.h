@@ -13,6 +13,7 @@ public:
     Volume(int vol);
     Volume(const QString str);
     QString toStr() const;
+    int toInt() const;
 private:
     void toVolume(QString str);
     void validate();

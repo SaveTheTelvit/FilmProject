@@ -1,9 +1,10 @@
 #include "import.h"
 #include "ui_import.h"
 
-Import::Import(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Import)
+Import::Import(QWidget *parent, DataBase *db) :
+    QWidget(parent)
+    ,ui(new Ui::Import)
+    ,db(db)
 {
     ui->setupUi(this);
     connect(ui->listWidget, &QListWidget::currentItemChanged, this, &Import::currentIndexChanged);
@@ -22,11 +23,14 @@ void Import::findImportFile()
     QString filePath = QFileDialog::getOpenFileName(this, tr("Импорт данных"), "/home" ,tr("tpls(*.tpls)"));
     if (filePath != "") {
         readImportFile(filePath);
+        std::sort(playlists.begin(), playlists.end(),
+                  [](const PlaylistInfo& pl1, const PlaylistInfo& pl2){return pl1.name < pl2.name;});
         for (int i = 0; i < playlists.size(); ++i) {
             QListWidgetItem *item = new QListWidgetItem(playlists[i].name, ui->listWidget);
             item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
             item->setCheckState(Qt::Unchecked);
         }
+        ui->listWidget->setCurrentRow(0);
     }
 }
 
@@ -36,6 +40,7 @@ void Import::on_pushButton_clicked()
         QListWidgetItem *item = ui->listWidget->item(i);
         if (item->checkState() == Qt::Checked) {
             qDebug() << QString("Элемент %1 отмечен " + item->text()).arg(i+1);
+            db->importPlaylistData(playlists[ui->listWidget->currentRow()]);
         }
     }
 }
