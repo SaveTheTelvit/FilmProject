@@ -99,44 +99,60 @@ bool DataBase::createPlaylistTlrFilmTable()
 int DataBase::insertIntoFilms(const QVariantList& data)
 {
     QSqlQuery query;
-    query.prepare("SELECT id FROM FILMS WHERE name = :name, "
-                  "format = :format, duration = :duration, titleTime = :titleTime, volume = :volume");
+    query.prepare("SELECT id FROM FILMS WHERE name = :name AND "
+                  "format = :format AND duration = :duration AND titleTime = :titleTime AND volume = :volume");
     query.bindValue(":name", data[0].toString());
     query.bindValue(":format", data[1].toInt());
     query.bindValue(":duration", data[2].toInt());
     query.bindValue(":titleTime", data[3].toInt());
     query.bindValue(":volume", data[4].toInt());
     query.exec();
-    query.prepare("INSERT INTO FILMS VALUES (NULL, :name, :format, :duration, :titleTime, :volume)");
-    query.bindValue(":name", data[0].toString());
-    query.bindValue(":format", data[1].toInt());
-    query.bindValue(":duration", data[2].toInt());
-    query.bindValue(":titleTime", data[3].toInt());
-    query.bindValue(":volume", data[4].toInt());
-    query.exec();
-    query.exec("SELECT last_insert_rowid()");
-    if (query.first()) return query.value(0).toInt();
-    return -1;
+    if (!query.first()) {
+        query.prepare("INSERT INTO FILMS VALUES (NULL, :name, :format, :duration, :titleTime, :volume)");
+        query.bindValue(":name", data[0].toString());
+        query.bindValue(":format", data[1].toInt());
+        query.bindValue(":duration", data[2].toInt());
+        query.bindValue(":titleTime", data[3].toInt());
+        query.bindValue(":volume", data[4].toInt());
+        query.exec();
+        query.exec("SELECT last_insert_rowid()");
+        if (query.first()) return query.value(0).toInt();
+        return -1;
+    }
+    return query.value(0).toInt();
 }
 
 int DataBase::insertIntoTlrs(const QVariantList& data)
 {
     QSqlQuery query;
-    query.prepare("INSERT INTO TLRS VALUES (NULL, :name, :duration, :volume)");
+    query.prepare("SELECT id FROM TLRS WHERE name = :name AND "
+                  "duration = :duration AND volume = :volume");
     query.bindValue(":name", data[0].toString());
     query.bindValue(":duration", data[1].toInt());
     query.bindValue(":volume", data[2].toInt());
     query.exec();
-    query.exec("SELECT last_insert_rowid()");
-    if (query.first()) return query.value(0).toInt();
-    return -1;
+    if (!query.first()) {
+        query.prepare("INSERT INTO TLRS VALUES (NULL, :name, :duration, :volume)");
+        query.bindValue(":name", data[0].toString());
+        query.bindValue(":duration", data[1].toInt());
+        query.bindValue(":volume", data[2].toInt());
+        query.exec();
+        query.exec("SELECT last_insert_rowid()");
+        if (query.first()) return query.value(0).toInt();
+        return -1;
+    }
+    return query.value(0).toInt();
 }
 
 int DataBase::insertIntoPlaylists(const QString& name)
 {
-    QSqlQuery query("INSERT INTO PLAYLISTS VALUES (NULL,'" + name + "');");
-    query.exec("SELECT last_insert_rowid()");
-    if (query.first()) return query.value(0).toInt();
+    QSqlQuery query("SELECT id FROM PLAYLISTS WHERE name = '" + name +"'");
+    if (!query.first()) {
+        query.exec("INSERT INTO PLAYLISTS VALUES (NULL,'" + name + "');");
+        query.exec("SELECT last_insert_rowid()");
+        if (query.first()) return query.value(0).toInt();
+        return -1;
+    }
     return -1;
 }
 
@@ -170,40 +186,44 @@ void DataBase::insertIntoFilmTlr(const QVariantList &data)
     query.exec();
 }
 
-void DataBase::importPlaylistData(const PlaylistInfo& playlist)
+bool DataBase::importPlaylistData(const PlaylistInfo& playlist)
 {
    int playlistID = insertIntoPlaylists(playlist.name);
-   for (int i = 0, n = 0; i < playlist.tlrs.size(); ++i) {
-      if (n < playlist.films.size() && playlist.films[n].pos == i) {
-         QVariantList filmInfo;
-         filmInfo.append(playlist.films[n].name);
-         filmInfo.append(playlist.films[n].format.toInt());
-         filmInfo.append(playlist.films[n].duration.duration());
-         filmInfo.append(playlist.films[n].titleTime.duration());
-         filmInfo.append(playlist.films[n].volume.toInt());
-         int filmID = insertIntoFilms(filmInfo);
-         QVariantList pllFilm;
-         pllFilm << playlistID << playlist.films[n].pos << filmID;
-         insertIntoPlaylistFilm(pllFilm);
-         for (int j = 0; j < playlist.films[n].tlrs.size(); ++j) {
-             QVariantList tlrInfo;
-             tlrInfo.append(playlist.films[n].tlrs[j].name);
-             tlrInfo.append(playlist.films[n].tlrs[j].duration.duration());
-             tlrInfo.append(playlist.films[n].tlrs[j].volume.toInt());
-             int tlrID = insertIntoTlrs(tlrInfo);
-             QVariantList filmTlr;
-             filmTlr << filmID << j << tlrID;
-             insertIntoFilmTlr(filmTlr);
-         }
-      } else {
-          QVariantList tlrInfo;
-          tlrInfo.append(playlist.tlrs[i].name);
-          tlrInfo.append(playlist.tlrs[i].duration.duration());
-          tlrInfo.append(playlist.tlrs[i].volume.toInt());
-          int tlrID = insertIntoTlrs(tlrInfo);
-          QVariantList pllTlr;
-          pllTlr << playlistID << i << tlrID;
-          insertIntoPlaylistTlr(pllTlr);
-      }
-   }
+   if (playlistID != -1) {
+       for (int i = 0, n = 0; i < playlist.tlrs.size(); ++i) {
+          if (n < playlist.films.size() && playlist.films[n].pos == i) {
+             QVariantList filmInfo;
+             filmInfo.append(playlist.films[n].name);
+             filmInfo.append(playlist.films[n].format.toInt());
+             filmInfo.append(playlist.films[n].duration.duration());
+             filmInfo.append(playlist.films[n].titleTime.duration());
+             filmInfo.append(playlist.films[n].volume.toInt());
+             int filmID = insertIntoFilms(filmInfo);
+             QVariantList pllFilm;
+             pllFilm << playlistID << playlist.films[n].pos << filmID;
+             insertIntoPlaylistFilm(pllFilm);
+             for (int j = 0; j < playlist.films[n].tlrs.size(); ++j) {
+                 QVariantList tlrInfo;
+                 tlrInfo.append(playlist.films[n].tlrs[j].name);
+                 tlrInfo.append(playlist.films[n].tlrs[j].duration.duration());
+                 tlrInfo.append(playlist.films[n].tlrs[j].volume.toInt());
+                 int tlrID = insertIntoTlrs(tlrInfo);
+                 QVariantList filmTlr;
+                 filmTlr << filmID << j << tlrID;
+                 insertIntoFilmTlr(filmTlr);
+             }
+             ++n;
+          } else {
+              QVariantList tlrInfo;
+              tlrInfo.append(playlist.tlrs[i].name);
+              tlrInfo.append(playlist.tlrs[i].duration.duration());
+              tlrInfo.append(playlist.tlrs[i].volume.toInt());
+              int tlrID = insertIntoTlrs(tlrInfo);
+              QVariantList pllTlr;
+              pllTlr << playlistID << i << tlrID;
+              insertIntoPlaylistTlr(pllTlr);
+          }
+       }
+       return true;
+   } else return false;
 }

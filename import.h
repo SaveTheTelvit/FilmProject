@@ -2,8 +2,9 @@
 #define IMPORT_H
 
 #include <algorithm>
-#include <QWidget>
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QWidget>
 #include <QXmlStreamReader>
 
 #include "database.h"
@@ -21,6 +22,10 @@ public:
     explicit Import(QWidget *parent = nullptr, DataBase *db = nullptr);
     ~Import();
     void findImportFile();
+
+signals:
+    void toMain();
+    void toImport();
 
 private slots:
     void on_pushButton_clicked();

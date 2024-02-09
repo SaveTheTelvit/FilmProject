@@ -20,7 +20,7 @@ public:
     void insertIntoPlaylistFilm(const QVariantList& data);
     void insertIntoPlaylistTlr(const QVariantList& data);
     void insertIntoFilmTlr(const QVariantList& data);
-    void importPlaylistData(const PlaylistInfo& playlist);
+    bool importPlaylistData(const PlaylistInfo& playlist);
 
 private:
     bool createFilmsTable();

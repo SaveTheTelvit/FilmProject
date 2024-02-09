@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent)
     import = new Import(this, db);
     ui->stackedWidget->addWidget(pll);
     ui->stackedWidget->addWidget(import);
+    connect(import, &Import::toMain, this, [this](){ui->stackedWidget->setCurrentWidget(pll);});
+    connect(import, &Import::toImport, this, [this](){ui->stackedWidget->setCurrentWidget(import);});
 }
 
 MainWindow::~MainWindow()
@@ -33,10 +35,14 @@ void MainWindow::setupMenu()
 void MainWindow::importData()
 {
     import->findImportFile();
-    ui->stackedWidget->setCurrentWidget(import);
 }
 
 void MainWindow::exportData()
 {
     qDebug() << "export";
+}
+
+void MainWindow::toPll()
+{
+    ui->stackedWidget->setCurrentWidget(pll);
 }

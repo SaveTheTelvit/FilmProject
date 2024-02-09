@@ -18,9 +18,9 @@ Import::~Import()
 
 void Import::findImportFile()
 {
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Импорт данных"), "/home" ,tr("tpls(*.tpls)"));
     playlists.clear();
     ui->listWidget->clear();
-    QString filePath = QFileDialog::getOpenFileName(this, tr("Импорт данных"), "/home" ,tr("tpls(*.tpls)"));
     if (filePath != "") {
         readImportFile(filePath);
         std::sort(playlists.begin(), playlists.end(),
@@ -31,6 +31,9 @@ void Import::findImportFile()
             item->setCheckState(Qt::Unchecked);
         }
         ui->listWidget->setCurrentRow(0);
+        emit toImport();
+    } else {
+        emit toMain();
     }
 }
 
@@ -40,7 +43,9 @@ void Import::on_pushButton_clicked()
         QListWidgetItem *item = ui->listWidget->item(i);
         if (item->checkState() == Qt::Checked) {
             qDebug() << QString("Элемент %1 отмечен " + item->text()).arg(i+1);
-            db->importPlaylistData(playlists[ui->listWidget->currentRow()]);
+            if (!db->importPlaylistData(playlists[ui->listWidget->row(item)])) {
+                qDebug() << "Плейлист с таким названием уже существует";
+            }
         }
     }
 }

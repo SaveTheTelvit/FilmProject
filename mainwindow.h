@@ -25,6 +25,7 @@ private:
     void importData();
     void exportData();
     void setupMenu();
+    void toPll();
     Import *import;
     PlaylistView *pll;
     Ui::MainWindow *ui;
